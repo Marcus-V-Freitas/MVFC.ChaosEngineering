@@ -1,4 +1,4 @@
-﻿# MVFC.ChaosEngineering
+# MVFC.ChaosEngineering
 
 Um middleware leve e de alta performance para ASP.NET Core, projetado para injetar caos controlado em pipelines HTTP. Fornece um conjunto essencial de ferramentas para testes de resiliência em ambientes de desenvolvimento e staging, auxiliando equipes na construção de sistemas distribuídos mais robustos.
 
@@ -17,11 +17,11 @@ Um middleware leve e de alta performance para ASP.NET Core, projetado para injet
 
 O `MVFC.ChaosEngineering` oferece uma abordagem fluida e baseada em políticas para testes de caos. Ao interceptar requisições HTTP, ele permite injetar uma ampla gama de modos de falha configuráveis — desde latência artificial e exceções até corpos de resposta corrompidos e limitação de largura de banda.
 
-As regras são aplicadas usando padrões de rota, avaliadas com base em probabilidades configuráveis e restritas a ambientes específicos, garantindo que o caos nunca impacte fluxos de produção inadvertidamente.
+As regras são aplicadas usando padrões de rota (com precedência determinística por especificidade), avaliadas com base em probabilidades configuráveis e restritas a ambientes específicos, garantindo que o caos nunca impacte fluxos de produção inadvertidamente.
 
 | Pacote | Finalidade | Downloads |
 |---|---|---|
-| **[MVFC.ChaosEngineering](src/MVFC.ChaosEngineering/README.md)** | Middleware de injeção de caos para aplicações ASP.NET Core. | ![Downloads](https://img.shields.io/nuget/dt/MVFC.ChaosEngineering) |
+| **[MVFC.ChaosEngineering](src/MVFC.ChaosEngineering/README.pt-BR.md)** | Middleware de injeção de caos para aplicações ASP.NET Core. | ![Downloads](https://img.shields.io/nuget/dt/MVFC.ChaosEngineering) |
 
 ---
 
@@ -37,7 +37,8 @@ O `MVFC.ChaosEngineering` preenche essa lacuna introduzindo falhas HTTP reais di
 
 - **16 Tipos de Caos**: Simule exceções, latência, erros 5xx aleatórios, timeouts, aborto de conexão, injeção de headers, throttling (429), corrupção de body e muito mais.
 - **Configuração Fluente**: API `ChaosPolicyBuilder` legível e encadeável para definição de regras sem esforço.
-- **Matching de Rota Flexível**: Alveje endpoints específicos (`/api/orders`) ou segmentos inteiros (`/api/payments/**`) usando padrões de curinga.
+- **Matching de Rota Flexível**: Alveje endpoints específicos (`/api/orders`) ou segmentos inteiros (`/api/payments/**`) usando padrões de curinga. Curingas como `/**` agora incluem corretamente o caminho base (ex: `/api/**` captura tanto `/api` quanto `/api/v1`).
+- **Precedência Determinística**: As regras são ordenadas automaticamente por especificidade. Padrões mais específicos (strings mais longas) sempre vencem curingas genéricos, independente da ordem de registro.
 - **Execução Probabilística**: Ajuste a frequência com que cada regra dispara usando uma probabilidade de `0.0` a `1.0`.
 - **Filtros de Request**: Escope a injeção de caos para requisições específicas baseadas em headers HTTP (ex: `X-Chaos: true`).
 - **Configuração Dinâmica**: Suporte nativo para `IOptionsMonitor`, permitindo atualizações de política em tempo real sem reiniciar a aplicação.
@@ -154,7 +155,7 @@ Para simular a degradação real do serviço, o middleware suporta três comport
 | `RandomLatency` | Introduz um atraso aleatório dentro de um intervalo `[min, max]`. | Passagem com atraso |
 | `StatusCode` | Retorna um status HTTP específico (ex: 503). | Curto-circuito |
 | `RandomStatusCode` | Seleciona aleatoriamente um status HTTP 5xx (500, 502, 503, 504). | Curto-circuito |
-| `Timeout` | Simula um serviço sem resposta travando indefinidamente. | Curto-circuito |
+| `Timeout` | Simula um serviço sem resposta introduzindo um longo atraso (100s). | Curto-circuito |
 | `Abort` | Encerra imediatamente a conexão TCP. | Curto-circuito |
 | `HeaderInjection` | Adiciona `X-Chaos-Injected` e headers customizados à resposta. | Passagem com interceptação |
 | `Throttle` | Simula rate limiting retornando HTTP 429 com `Retry-After`. | Curto-circuito |
@@ -234,7 +235,7 @@ A biblioteca foi projetada para uso em produção, com integração profunda em 
 
 ### Métricas (OpenTelemetry)
 Expõe diversas métricas sob o meter `MVFC.ChaosEngineering`:
-- `chaos.faults.injected`: Total de falhas injetadas (com tags `chaos.kind` e `chaos.route`).
+- `chaos.faults.injected`: Total de falhas injetadas (com tags `chaos.kind` e `chaos.route` (caminho real da requisição)).
 - `chaos.requests.evaluated`: Número total de requisições que passaram pelo middleware.
 - `chaos.latency.duration`: Um histograma da latência injetada (analise p95/p99).
 

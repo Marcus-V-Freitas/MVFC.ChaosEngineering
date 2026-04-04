@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Middleware;
+﻿namespace MVFC.ChaosEngineering.Middleware;
 
 /// <summary>
 /// ASP.NET Core middleware that evaluates a <see cref="ChaosPolicy"/> on every request
@@ -31,16 +31,16 @@ internal sealed class ChaosMiddleware(
     {
         _instrumentation.RecordEvaluation();
 
-        var decision = CurrentPolicy.Evaluate(context);
+        var rule = CurrentPolicy.Evaluate(context);
 
-        if (!decision.ShouldInject)
+        if (rule is null)
         {
             await _next(context).ConfigureAwait(false);
             return;
         }
 
         var chaosId = Guid.NewGuid().ToString("N");
-        var kindString = decision.Kind.ToString();
+        var kindString = rule.Kind.ToString();
         var path = context.Request.Path.Value ?? "/";
 
         // Logging & Metrics
@@ -61,13 +61,13 @@ internal sealed class ChaosMiddleware(
         context.Response.Headers["X-Chaos-Injected"] = "true";
         context.Response.Headers["X-Chaos-Id"] = chaosId;
 
-        await InjectFaultAsync(context, decision, path).ConfigureAwait(false);
+        await InjectFaultAsync(context, rule, path).ConfigureAwait(false);
     }
 
-    /// <summary>Injects the specific fault described by the <see cref="ChaosDecision"/>.</summary>
-    private async Task InjectFaultAsync(HttpContext context, ChaosDecision decision, string path)
+    /// <summary>Injects the specific fault described by the <see cref="ChaosRule"/>.</summary>
+    private async Task InjectFaultAsync(HttpContext context, ChaosRule rule, string path)
     {
-        var handler = ChaosHandlerRegistry.GetHandler(decision.Kind);
-        await handler.HandleAsync(context, decision, _next, _instrumentation, path).ConfigureAwait(false);
+        var handler = ChaosHandlerRegistry.GetHandler(rule.Kind);
+        await handler.HandleAsync(context, rule, _next, _instrumentation, path).ConfigureAwait(false);
     }
 }

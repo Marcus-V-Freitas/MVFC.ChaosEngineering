@@ -1,4 +1,4 @@
-﻿# MVFC.ChaosEngineering
+# MVFC.ChaosEngineering
 
 A lightweight, high-performance ASP.NET Core middleware designed to inject controlled chaos into HTTP pipelines. It provides an essential toolkit for resilience testing in development and staging environments, helping teams build more robust distributed systems.
 
@@ -17,7 +17,7 @@ A lightweight, high-performance ASP.NET Core middleware designed to inject contr
 
 `MVFC.ChaosEngineering` offers a fluent, policy-driven approach to chaos testing. By intercepting incoming HTTP requests, it can inject a wide range of configurable failure modes — from artificial latency and exceptions to corrupted response bodies and bandwidth throttling.
 
-Rules are matched using route patterns, evaluated based on configurable probabilities, and strictly scoped to specific environments to ensure that chaos never inadvertently impacts production workloads.
+Rules are matched using route patterns (with deterministic specificity precedence), evaluated based on configurable probabilities, and strictly scoped to specific environments to ensure that chaos never inadvertently impacts production workloads.
 
 | Package | Service | Downloads |
 |---|---|---|
@@ -37,7 +37,8 @@ Modern distributed systems are prone to unpredictable failures: cascading timeou
 
 - **16 Diverse Chaos Kinds**: Simulate exceptions, latency, random 5xx errors, timeouts, connection aborts, header injection, service throttling (429), body corruption, and more.
 - **Fluent Configuration**: A readable, chainable `ChaosPolicyBuilder` API for effortless rule definition.
-- **Flexible Route Matching**: Target specific endpoints (`/api/orders`) or entire path segments (`/api/payments/**`) using wildcard patterns.
+- **Flexible Route Matching**: Target specific endpoints (`/api/orders`) or entire path segments (`/api/payments/**`) using wildcard patterns. Wildcards like `/**` now correctly include the base path (e.g., `/api/**` matches both `/api` and `/api/v1`).
+- **Deterministic Precedence**: Rules are automatically sorted by specificity. More specific patterns (longer strings) always take precedence over general wildcards, regardless of registration order.
 - **Probabilistic Execution**: Fine-tune how often each rule fires using a probability range from `0.0` to `1.0`.
 - **Request Filtering**: Scope chaos injection to specific requests based on HTTP headers (e.g., `X-Chaos: true`).
 - **Dynamic Configuration**: Built-in support for `IOptionsMonitor`, allowing real-time policy updates without application restarts.
@@ -154,7 +155,7 @@ To simulate realistic service degradation, the middleware supports three primary
 | `RandomLatency` | Introduces a random delay within a specified `[min, max]` range. | Pass-through + delay |
 | `StatusCode` | Returns a specific HTTP status code (e.g., 503). | Short-circuit |
 | `RandomStatusCode` | Randomly selects a 5xx series status code (500, 502, 503, 504). | Short-circuit |
-| `Timeout` | Simulates an unresponsive service by hanging indefinitely. | Short-circuit |
+| `Timeout` | Simulates an unresponsive service by introducing a long delay (100s). | Short-circuit |
 | `Abort` | Immediately terminates the TCP connection. | Short-circuit |
 | `HeaderInjection` | Adds `X-Chaos-Injected` and custom headers to the response. | Pass-through + intercept |
 | `Throttle` | Simulates rate limiting by returning HTTP 429 with `Retry-After`. | Short-circuit |
@@ -234,7 +235,7 @@ The library is designed for production use, with deep integration into modern ob
 
 ### Metrics (OpenTelemetry)
 It exposes several `Counter` and `Histogram` metrics under the `MVFC.ChaosEngineering` meter:
-- `chaos.faults.injected`: Total number of faults injected (with `chaos.kind` and `chaos.route` tags).
+- `chaos.faults.injected`: Total number of faults injected (with `chaos.kind` and `chaos.route` (actual request path) tags).
 - `chaos.requests.evaluated`: Total number of requests that passed through the middleware.
 - `chaos.latency.duration`: A histogram of injected latency (p95/p99 analysis).
 

@@ -1,4 +1,4 @@
-﻿namespace MVFC.ChaosEngineering.Tests;
+namespace MVFC.ChaosEngineering.Tests;
 
 public sealed class ChaosRuleTests
 {
@@ -7,7 +7,7 @@ public sealed class ChaosRuleTests
     [InlineData("/API/ORDERS", "/api/orders", true)]
     [InlineData("/api/orders/123", "/api/orders", false)]
     [InlineData("/api/orders/123", "/api/orders/**", true)]
-    [InlineData("/api/orders", "/api/orders/**", false)]
+    [InlineData("/api/orders", "/api/orders/**", true)]
     [InlineData("/api/payments/pix/123", "/api/payments/**", true)]
     [InlineData("/other", "/api/**", false)]
     public void Matches_ShouldRespectPatternSemantics(string path, string pattern, bool expected)

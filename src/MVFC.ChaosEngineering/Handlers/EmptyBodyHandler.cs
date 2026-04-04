@@ -1,7 +1,7 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
-/// Handler that returns a 200 OK with no content and Content-Length set to 0.
+/// Handler that returns a 200 OK but with an empty response body.
 /// </summary>
 internal sealed class EmptyBodyHandler : IChaosHandler
 {
@@ -9,15 +9,15 @@ internal sealed class EmptyBodyHandler : IChaosHandler
     public ChaosKind Kind => ChaosKind.EmptyBody;
 
     /// <inheritdoc />
-    public Task HandleAsync(
+    public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
         context.Response.StatusCode = StatusCodes.Status200OK;
         context.Response.ContentLength = 0;
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 }

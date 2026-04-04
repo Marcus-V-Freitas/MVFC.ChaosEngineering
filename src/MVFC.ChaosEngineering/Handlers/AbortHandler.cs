@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that aborts the current TCP connection immediately.
@@ -11,7 +11,7 @@ internal sealed class AbortHandler : IChaosHandler
     /// <inheritdoc />
     public Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)

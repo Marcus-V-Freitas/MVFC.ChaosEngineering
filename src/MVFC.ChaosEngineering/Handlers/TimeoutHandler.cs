@@ -1,7 +1,7 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
-/// Handler that simulates a request timeout by delaying indefinitely until the request is aborted.
+/// Handler that simulates a request timeout by delaying longer than a typical client timeout.
 /// </summary>
 internal sealed class TimeoutHandler : IChaosHandler
 {
@@ -11,9 +11,9 @@ internal sealed class TimeoutHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
-        string path) =>
-            await Task.Delay(Timeout.InfiniteTimeSpan, context.RequestAborted).ConfigureAwait(false);
+        string path) => // Induce a delay that exceeds typical client timeouts (e.g. 100 seconds)        
+            await Task.Delay(TimeSpan.FromSeconds(100), context.RequestAborted).ConfigureAwait(false);
 }

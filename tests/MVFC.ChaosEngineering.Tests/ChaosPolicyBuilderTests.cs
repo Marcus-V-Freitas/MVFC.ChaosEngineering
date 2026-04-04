@@ -10,7 +10,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).ShouldInject.Should().BeTrue();
+        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).ShouldInject.Should().BeTrue();
+        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public sealed class ChaosPolicyBuilderTests
             .Build();
 
         policy.Should().BeSameAs(ChaosPolicy.Disabled);
-        policy.Evaluate(HostHelper.CreateContext("/api")).ShouldInject.Should().BeFalse();
+        policy.Evaluate(HostHelper.CreateContext("/api")).Should().BeNull();
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).ShouldInject.Should().BeTrue();
+        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -62,15 +62,16 @@ public sealed class ChaosPolicyBuilderTests
     }
 
     [Fact]
-    public void MultipleRules_FirstMatchWins()
+    public void MultipleRules_SpecificMatchWinsRegardlessOfOrder()
     {
         var policy = new ChaosPolicyBuilder()
             .ForRoute("/api/**").WithProbability(1.0).WithStatusCode(503)
             .ForRoute("/api/orders").WithProbability(1.0).WithKind(ChaosKind.Abort)
             .Build();
 
-        // /api/orders matches both, but wildcard rule is first
-        var decision = policy.Evaluate(HostHelper.CreateContext("/api/orders"));
-        decision.Kind.Should().Be(ChaosKind.StatusCode);
+        // /api/orders (len 11) is more specific than /api/** (len 7)
+        var rule = policy.Evaluate(HostHelper.CreateContext("/api/orders"));
+        rule.Should().NotBeNull();
+        rule!.Kind.Should().Be(ChaosKind.Abort);
     }
 }

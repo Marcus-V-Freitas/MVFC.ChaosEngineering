@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that injects a random delay within a specified range before letting the request proceed.
@@ -11,17 +11,17 @@ internal sealed class RandomLatencyHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
-        var minMs = (int)decision.MinLatency.TotalMilliseconds;
-        var maxMs = (int)decision.MaxLatency.TotalMilliseconds;
+        var minMs = (int)rule.MinLatency.TotalMilliseconds;
+        var maxMs = (int)rule.MaxLatency.TotalMilliseconds;
         var delayMs = Random.Shared.Next(minMs, maxMs + 1);
 
         instrumentation.RecordLatency(delayMs, "RandomLatency", path);
-        
+
         await Task.Delay(TimeSpan.FromMilliseconds(delayMs), context.RequestAborted).ConfigureAwait(false);
         await next(context).ConfigureAwait(false);
     }

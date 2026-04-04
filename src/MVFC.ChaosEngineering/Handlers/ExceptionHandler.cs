@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that throws a configured exception or a default <see cref="ChaosException"/>.
@@ -11,14 +11,14 @@ internal sealed class ExceptionHandler : IChaosHandler
     /// <inheritdoc />
     public Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
-        var ex = decision.ExceptionFactory?.Invoke(context)
-            ?? (decision.ExceptionType is not null
-                ? (Activator.CreateInstance(decision.ExceptionType) as Exception)
+        var ex = rule.ExceptionFactory?.Invoke(context)
+            ?? (rule.ExceptionType is not null
+                ? (Activator.CreateInstance(rule.ExceptionType) as Exception)
                 : null)
             ?? new ChaosException();
 

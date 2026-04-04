@@ -1,6 +1,12 @@
 namespace MVFC.ChaosEngineering.Policy;
 
-/// <summary>Represents a collection of chaos rules that are evaluated against incoming requests.</summary>
+/// <summary>
+/// Represents a collection of chaos rules that are evaluated against incoming requests.
+/// </summary>
+/// <remarks>
+/// Rules are evaluated in order of specificity (longest pattern first). 
+/// The first rule that matches the request criteria is selected.
+/// </remarks>
 public sealed class ChaosPolicy
 {
     /// <summary>A policy that never injects chaos (e.g. wrong environment).</summary>
@@ -12,24 +18,26 @@ public sealed class ChaosPolicy
     /// <param name="rules">The list of rules to evaluate.</param>
     internal ChaosPolicy(IReadOnlyList<ChaosRule> rules)
     {
-        _rules = rules;
+        // Sort rules by pattern length descending to ensure more specific rules match first
+        _rules = rules
+            .OrderByDescending(r => r.Pattern.Length)
+            .ToList()
+            .AsReadOnly();
     }
 
     /// <summary>
     /// Evaluates the policy against the given HTTP context.
-    /// Returns a <see cref="ChaosDecision"/> indicating whether and what chaos should be injected.
+    /// Returns a <see cref="ChaosRule"/> if chaos should be injected; otherwise, <c>null</c>.
     /// </summary>
     /// <param name="context">The HTTP context.</param>
-    internal ChaosDecision Evaluate(HttpContext context)
+    /// <returns>A <see cref="ChaosRule"/> instance if a match is found and probability is met; otherwise, <c>null</c>.</returns>
+    internal ChaosRule? Evaluate(HttpContext context)
     {
         var rule = _rules.FirstOrDefault(r => r.Matches(context));
 
         if (rule is null)
-            return ChaosDecision.None;
+            return null;
 
-        if (!rule.ShouldFire())
-            return ChaosDecision.None;
-
-        return ChaosDecision.FromRule(rule);
+        return rule.ShouldFire() ? rule : null;
     }
 }

@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that overwrites the Content-Type header with an invalid or unexpected value.
@@ -11,14 +11,14 @@ internal sealed class ContentTypeCorruptionHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
         context.Response.OnStarting(() =>
         {
-            context.Response.ContentType = decision.CorruptContentType;
+            context.Response.ContentType = rule.CorruptContentType;
             return Task.CompletedTask;
         });
 

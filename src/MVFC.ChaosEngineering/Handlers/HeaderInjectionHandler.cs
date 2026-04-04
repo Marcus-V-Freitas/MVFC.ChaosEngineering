@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that injects custom HTTP headers into the response.
@@ -11,16 +11,16 @@ internal sealed class HeaderInjectionHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
-        if (decision.Headers is { Count: > 0 })
+        if (rule.Headers is { Count: > 0 })
         {
             context.Response.OnStarting(() =>
             {
-                foreach (var (name, value) in decision.Headers)
+                foreach (var (name, value) in rule.Headers)
                     context.Response.Headers[name] = value;
                 return Task.CompletedTask;
             });

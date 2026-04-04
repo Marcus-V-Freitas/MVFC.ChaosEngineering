@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that simulates a slow response body by injecting delays between chunks of data.
@@ -11,7 +11,7 @@ internal sealed class SlowBodyHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
@@ -32,8 +32,8 @@ internal sealed class SlowBodyHandler : IChaosHandler
         await ThrottledWriter.WriteAsync(
             originalBody,
             capture.ToArray(),
-            decision.ChunkSize,
-            decision.ChunkDelay,
+            rule.ChunkSize,
+            rule.ChunkDelay,
             context.RequestAborted).ConfigureAwait(false);
     }
 }

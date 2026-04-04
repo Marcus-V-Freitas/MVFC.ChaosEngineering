@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that sends only a partial response body and then aborts the connection.
@@ -11,7 +11,7 @@ internal sealed class PartialResponseHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
@@ -19,7 +19,7 @@ internal sealed class PartialResponseHandler : IChaosHandler
         context.Response.StatusCode = StatusCodes.Status200OK;
         context.Response.ContentType = "text/plain";
 
-        var partial = Encoding.UTF8.GetBytes(new string('x', decision.PartialBytes));
+        var partial = Encoding.UTF8.GetBytes(new string('x', rule.PartialBytes));
         await context.Response.Body.WriteAsync(partial, context.RequestAborted).ConfigureAwait(false);
         await context.Response.Body.FlushAsync(context.RequestAborted).ConfigureAwait(false);
 

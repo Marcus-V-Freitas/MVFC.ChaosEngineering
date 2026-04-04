@@ -62,12 +62,14 @@ internal sealed record ChaosRule(
         if (Pattern.EndsWith("/**", StringComparison.Ordinal))
         {
             var prefix = Pattern[..^3];
-            pathMatch = path.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase);
+            pathMatch = string.Equals(path, prefix, StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase);
         }
         else
         {
             pathMatch = string.Equals(path, Pattern, StringComparison.OrdinalIgnoreCase);
         }
+
 
         if (!pathMatch)
             return false;

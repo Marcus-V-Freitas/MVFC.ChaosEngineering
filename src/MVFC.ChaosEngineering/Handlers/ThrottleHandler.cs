@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that returns a 429 Too Many Requests status code with a Retry-After header.
@@ -11,17 +11,17 @@ internal sealed class ThrottleHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
-        var retryAfterSeconds = decision.RetryAfter.HasValue
-            ? (int)Math.Ceiling(decision.RetryAfter.Value.TotalSeconds)
+        var retryAfterSeconds = rule.RetryAfter.HasValue
+            ? (int)Math.Ceiling(rule.RetryAfter.Value.TotalSeconds)
             : 5;
 
-        context.Response.StatusCode = decision.StatusCode;
+        context.Response.StatusCode = rule.StatusCode;
         context.Response.Headers.RetryAfter = retryAfterSeconds.ToString(CultureInfo.InvariantCulture);
-        await context.Response.WriteAsync($"Chaos engineering: HTTP {decision.StatusCode} too many requests injected.", context.RequestAborted).ConfigureAwait(false);
+        await context.Response.WriteAsync($"Chaos engineering: HTTP {rule.StatusCode} too many requests injected.", context.RequestAborted).ConfigureAwait(false);
     }
 }

@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Handler that injects a fixed delay before letting the request proceed.
@@ -11,15 +11,15 @@ internal sealed class LatencyHandler : IChaosHandler
     /// <inheritdoc />
     public async Task HandleAsync(
         HttpContext context,
-        ChaosDecision decision,
+        ChaosRule rule,
         RequestDelegate next,
         ChaosInstrumentation instrumentation,
         string path)
     {
-        var ms = decision.Latency.TotalMilliseconds;
+        var ms = rule.Latency.TotalMilliseconds;
         instrumentation.RecordLatency(ms, "Latency", path);
-        
-        await Task.Delay(decision.Latency, context.RequestAborted).ConfigureAwait(false);
+
+        await Task.Delay(rule.Latency, context.RequestAborted).ConfigureAwait(false);
         await next(context).ConfigureAwait(false);
     }
 }
