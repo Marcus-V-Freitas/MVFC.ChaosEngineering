@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <Authors>Marcus Vinicius de Freitas Costa</Authors>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://www.nuget.org/packages/MVFC.ChaosEngineering</PackageProjectUrl>
+    <PackageTags>chaos-engineering;chaos;middleware;aspnetcore;fault-injection;resilience;testing</PackageTags>
+    <RepositoryUrl>https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering</RepositoryUrl>
+    <Description>Lightweight chaos engineering middleware for ASP.NET Core. Inject faults, latency, status codes and aborts per route with configurable probability and environment guards.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>MVFC.ChaosEngineering.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

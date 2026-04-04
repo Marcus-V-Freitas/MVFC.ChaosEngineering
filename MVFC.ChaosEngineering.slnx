@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/playground/">
+    <Project Path="playground/MVFC.ChaosEngineering.Playground.Api/MVFC.ChaosEngineering.Playground.Api.csproj" />
+    <Project Path="playground/MVFC.ChaosEngineering.Playground.AppHost/MVFC.ChaosEngineering.Playground.AppHost.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MVFC.ChaosEngineering/MVFC.ChaosEngineering.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MVFC.ChaosEngineering.Tests/MVFC.ChaosEngineering.Tests.csproj" />
+  </Folder>
+</Solution>
