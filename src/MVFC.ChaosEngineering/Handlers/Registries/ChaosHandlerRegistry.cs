@@ -1,11 +1,12 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers.Registries;
 
 /// <summary>
 /// Registry for all available chaos handlers, providing a central point for handler resolution.
 /// </summary>
-internal static class ChaosHandlerRegistry
+internal sealed class ChaosHandlerRegistry : IChaosHandlerRegistry
 {
-    private static readonly Dictionary<ChaosKind, IChaosHandler> _handlers =
+    /// <summary>The dictionary mapping chaos kinds to their handlers.</summary>
+    private static readonly FrozenDictionary<ChaosKind, IChaosHandler> _handlers =
         new List<IChaosHandler>
         {
             new AbortHandler(),
@@ -24,16 +25,15 @@ internal static class ChaosHandlerRegistry
             new StatusCodeHandler(),
             new ThrottleHandler(),
             new TimeoutHandler()
-        }.ToDictionary(h => h.Kind);
+        }.ToFrozenDictionary(h => h.Kind);
 
+    /// <summary>The default handler to use when no specific handler is found.</summary>
     private static readonly IChaosHandler _defaultHandler = new ExceptionHandler();
 
-    /// <summary>
-    /// Gets the handler for the specified chaos kind.
-    /// </summary>
+    /// <summary>Gets the handler for the specified chaos kind.</summary>
     /// <param name="kind">The chaos kind.</param>
     /// <returns>The corresponding <see cref="IChaosHandler"/>, or a default handler if not found.</returns>
-    public static IChaosHandler GetHandler(ChaosKind kind)
+    public IChaosHandler GetHandler(ChaosKind kind)
     {
         return _handlers.TryGetValue(kind, out var handler)
             ? handler

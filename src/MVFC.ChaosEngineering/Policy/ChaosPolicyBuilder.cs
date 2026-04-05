@@ -1,11 +1,11 @@
-namespace MVFC.ChaosEngineering.Policy;
+﻿namespace MVFC.ChaosEngineering.Policy;
 
 /// <summary>Fluent builder for creating a <see cref="ChaosPolicy"/>.</summary>
 public sealed class ChaosPolicyBuilder
 {
     private readonly List<ChaosEnvironment> _environments = [];
     private readonly List<ChaosRule> _rules = [];
-    private ChaosRule? _currentRule;
+    private int _currentIndex = -1;
     private string? _aspNetCoreEnvironment;
 
     /// <summary>Configures the environments where this policy is active.</summary>
@@ -34,11 +34,12 @@ public sealed class ChaosPolicyBuilder
     /// <returns>The builder instance.</returns>
     public ChaosPolicyBuilder ForRoute(string pattern)
     {
-        _currentRule = new ChaosRule
+        _rules.Add(new ChaosRule
         {
             Pattern = pattern,
-        };
-        _rules.Add(_currentRule);
+        });
+
+        _currentIndex = _rules.Count - 1;
 
         return this;
     }
@@ -149,7 +150,7 @@ public sealed class ChaosPolicyBuilder
     {
         EnsureCurrentRule();
 
-        var existing = _currentRule!;
+        var existing = _rules[_currentIndex];
         var map = existing.Headers is null
             ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             : new Dictionary<string, string>(existing.Headers, StringComparer.OrdinalIgnoreCase);
@@ -281,6 +282,8 @@ public sealed class ChaosPolicyBuilder
     /// <returns>A new <see cref="ChaosPolicy"/> instance, or <see cref="ChaosPolicy.Disabled"/> if the environment does not match.</returns>
     public ChaosPolicy Build()
     {
+        ValidateBuild();
+
         if (_environments.Count == 0)
             return new ChaosPolicy(_rules.AsReadOnly());
 
@@ -293,12 +296,31 @@ public sealed class ChaosPolicyBuilder
         return allowed ? new ChaosPolicy(_rules.AsReadOnly()) : ChaosPolicy.Disabled;
     }
 
+    /// <summary>Validates the policy configuration before building.</summary>
+    private void ValidateBuild()
+    {
+        foreach (var rule in _rules)
+        {
+            if (!double.IsFinite(rule.Probability) || rule.Probability is < 0.0 or > 1.0)
+                throw new InvalidOperationException($"Probability must be between 0.0 and 1.0, got {rule.Probability} for route '{rule.Pattern}'.");
+
+            if (rule.Kind == ChaosKind.BandwidthThrottle && rule.BytesPerSecond <= 0)
+                throw new InvalidOperationException($"BytesPerSecond must be > 0 for BandwidthThrottle on route '{rule.Pattern}'.");
+
+            if (rule.Kind == ChaosKind.PartialResponse && rule.PartialBytes <= 0)
+                throw new InvalidOperationException($"PartialBytes must be > 0 for PartialResponse on route '{rule.Pattern}'.");
+
+            if (rule.Kind == ChaosKind.RandomLatency && rule.MinLatency > rule.MaxLatency)
+                throw new InvalidOperationException($"MinLatency must be <= MaxLatency for route '{rule.Pattern}'.");
+        }
+    }
+
     /// <summary>Replaces the last rule with an updated version.</summary>
     private ChaosPolicyBuilder Replace(Func<ChaosRule, ChaosRule> update)
     {
-        var updated = update(_currentRule!);
-        _rules[^1] = updated;
-        _currentRule = updated;
+        EnsureCurrentRule();
+
+        _rules[_currentIndex] = update(_rules[_currentIndex]);
 
         return this;
     }
@@ -306,7 +328,7 @@ public sealed class ChaosPolicyBuilder
     /// <summary>Ensures that a rule has been started with <see cref="ForRoute"/>.</summary>
     private void EnsureCurrentRule()
     {
-        if (_currentRule is null)
+        if (_currentIndex < 0)
             throw new InvalidOperationException("Call ForRoute() before configuring rule properties.");
     }
 }

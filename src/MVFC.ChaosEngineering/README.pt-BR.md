@@ -1,4 +1,4 @@
-﻿# MVFC.ChaosEngineering
+# MVFC.ChaosEngineering
 
 Um middleware leve e de alta performance para ASP.NET Core, projetado para injetar caos controlado em pipelines HTTP. Fornece um conjunto essencial de ferramentas para testes de resiliência em ambientes de desenvolvimento e staging, auxiliando equipes na construção de sistemas distribuídos mais robustos.
 
@@ -38,12 +38,13 @@ O `MVFC.ChaosEngineering` preenche essa lacuna introduzindo falhas HTTP reais di
 - **16 Tipos de Caos**: Simule exceções, latência, erros 5xx aleatórios, timeouts, aborto de conexão, injeção de headers, throttling (429), corrupção de body e muito mais.
 - **Configuração Fluente**: API `ChaosPolicyBuilder` legível e encadeável para definição de regras sem esforço.
 - **Matching de Rota Flexível**: Alveje endpoints específicos (`/api/orders`) ou segmentos inteiros (`/api/payments/**`) usando padrões de curinga. Curingas como `/**` agora incluem corretamente o caminho base (ex: `/api/**` captura tanto `/api` quanto `/api/v1`).
-- **Precedência Determinística**: As regras são ordenadas automaticamente por especificidade. Padrões mais específicos (strings mais longas) sempre vencem curingas genéricos, independente da ordem de registro.
+- **Configuração Multi-Regra**: Encadeie múltiplas regras `ForRoute` em uma única política. As regras são ordenadas automaticamente por especificidade (comprimento do path), garantindo que a regra mais específica sempre vença.
 - **Execução Probabilística**: Ajuste a frequência com que cada regra dispara usando uma probabilidade de `0.0` a `1.0`.
 - **Filtros de Request**: Escope a injeção de caos para requisições específicas baseadas em headers HTTP (ex: `X-Chaos: true`).
+- **Validação Integrada**: Verificações automáticas durante o `.Build()` para prevenir erros de configuração (probabilidades inválidas, banda negativa, etc.).
 - **Configuração Dinâmica**: Suporte nativo para `IOptionsMonitor`, permitindo atualizações de política em tempo real sem reiniciar a aplicação.
 - **Observabilidade e Métricas**: Logging estruturado integrado e métricas prontas para OpenTelemetry (`System.Diagnostics.Metrics`).
-- **Environment Gating**: Mecanismos de segurança integrados para restringir o caos a ambientes de não-produção.
+- **Bloqueio por Ambiente**: Mecanismos de segurança integrados para restringir o caos a ambientes de não-produção.
 - **Zero Dependências Externas**: Implementação leve construída diretamente sobre `Microsoft.AspNetCore.Http` e abstrações padrão do .NET.
 
 ---
@@ -171,7 +172,7 @@ Para simular a degradação real do serviço, o middleware suporta três comport
 
 ### Arquitetura Interna
 
-A biblioteca segue o **Padrão Strategy** para injeção de falhas. Cada `ChaosKind` é gerenciado por uma implementação especializada de `IChaosHandler`, garantindo que o middleware permaneça limpo, sustentável e de alta performance (resolução O(1) via registro interno).
+A biblioteca segue o **Padrão Strategy** para injeção de falhas. Cada `ChaosKind` é gerenciado por uma implementação especializada de `IChaosHandler` resolvida através de um **Registro preparado para DI**, garantindo que o middleware permaneça limpo, sustentável e de alta performance (resolução O(1)).
 
 ## Performance
 

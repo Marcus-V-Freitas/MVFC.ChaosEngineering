@@ -3,6 +3,56 @@
 public sealed class ChaosMiddlewareTests
 {
     [Fact]
+    public async Task Middleware_Probability_HonorsConfiguredRate()
+    {
+        const int ITERATIONS = 1000;
+        const double TARGET_PROBABILITY = 0.5;
+        const double TOLERANCE = 0.08;
+
+        var policy = new ChaosPolicyBuilder()
+            .ForRoute("/api/orders")
+            .WithProbability(TARGET_PROBABILITY)
+            .WithStatusCode(503)
+            .Build();
+
+        using var host = HostHelper.BuildHost(policy);
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
+
+        var faultCount = 0;
+        for (var i = 0; i < ITERATIONS; i++)
+        {
+            var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken);
+            if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+                faultCount++;
+        }
+
+        var actualRate = (double)faultCount / ITERATIONS;
+        actualRate.Should().BeApproximately(TARGET_PROBABILITY, TOLERANCE, $"expected ~{TARGET_PROBABILITY * 100}% fault rate, got {actualRate * 100:F1}%");
+    }
+
+    [Fact]
+    public async Task Middleware_MultipleRules_FallsBackToWildcard_WhenFirstRuleDoesNotFire()
+    {
+        var policy = new ChaosPolicyBuilder()
+            .ForRoute("/api/orders")
+            .WithProbability(0.0)        // nunca dispara
+            .WithStatusCode(503)
+            .ForRoute("/api/**")         // wildcard fallback
+            .WithProbability(1.0)
+            .WithStatusCode(500)
+            .Build();
+
+        using var host = HostHelper.BuildHost(policy);
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
+
+        var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
     public async Task Middleware_DisabledPolicy_PassesThrough()
     {
         using var host = HostHelper.BuildHost(ChaosPolicy.Disabled);

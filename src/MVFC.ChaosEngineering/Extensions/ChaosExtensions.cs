@@ -17,19 +17,10 @@ public static class ChaosExtensions
         ArgumentNullException.ThrowIfNull(configure);
 
         services.TryAddSingleton<ChaosInstrumentation>();
+        services.AddSingleton<IChaosHandlerRegistry, ChaosHandlerRegistry>();
         services.AddSingleton<IOptionsFactory<ChaosPolicy>>(sp => new ChaosPolicyFactory(configure));
 
         return services;
-    }
-
-    private sealed class ChaosPolicyFactory(Action<ChaosPolicyBuilder> configure) : IOptionsFactory<ChaosPolicy>
-    {
-        public ChaosPolicy Create(string name)
-        {
-            var builder = new ChaosPolicyBuilder();
-            configure(builder);
-            return builder.Build();
-        }
     }
 
     /// <summary>
@@ -41,9 +32,10 @@ public static class ChaosExtensions
         ArgumentNullException.ThrowIfNull(policy);
 
         var logger = app.ApplicationServices.GetRequiredService<ILogger<ChaosMiddleware>>();
-        var instrumentation = app.ApplicationServices.GetService<ChaosInstrumentation>() ?? new ChaosInstrumentation();
+        var instrumentation = app.ApplicationServices.GetRequiredService<ChaosInstrumentation>();
+        var handlerRegistry = app.ApplicationServices.GetRequiredService<IChaosHandlerRegistry>();
 
-        return app.UseMiddleware<ChaosMiddleware>(logger, instrumentation, policy);
+        return app.UseMiddleware<ChaosMiddleware>(logger, instrumentation, handlerRegistry, policy);
     }
 
     /// <summary>
@@ -67,7 +59,9 @@ public static class ChaosExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         var logger = app.ApplicationServices.GetRequiredService<ILogger<ChaosMiddleware>>();
-        var instrumentation = app.ApplicationServices.GetService<ChaosInstrumentation>() ?? new ChaosInstrumentation();
-        return app.UseMiddleware<ChaosMiddleware>(logger, instrumentation);
+        var instrumentation = app.ApplicationServices.GetRequiredService<ChaosInstrumentation>();
+        var handlerRegistry = app.ApplicationServices.GetRequiredService<IChaosHandlerRegistry>();
+
+        return app.UseMiddleware<ChaosMiddleware>(logger, instrumentation, handlerRegistry);
     }
 }

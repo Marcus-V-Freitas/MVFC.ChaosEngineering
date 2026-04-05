@@ -8,6 +8,7 @@ internal sealed class ChaosMiddleware(
     RequestDelegate next,
     ILogger<ChaosMiddleware> logger,
     ChaosInstrumentation instrumentation,
+    IChaosHandlerRegistry registry,
     ChaosPolicy? policy = null,
     IOptionsMonitor<ChaosPolicy>? options = null)
 {
@@ -67,7 +68,7 @@ internal sealed class ChaosMiddleware(
     /// <summary>Injects the specific fault described by the <see cref="ChaosRule"/>.</summary>
     private async Task InjectFaultAsync(HttpContext context, ChaosRule rule, string path)
     {
-        var handler = ChaosHandlerRegistry.GetHandler(rule.Kind);
+        var handler = registry.GetHandler(rule.Kind);
         await handler.HandleAsync(context, rule, _next, _instrumentation, path).ConfigureAwait(false);
     }
 }

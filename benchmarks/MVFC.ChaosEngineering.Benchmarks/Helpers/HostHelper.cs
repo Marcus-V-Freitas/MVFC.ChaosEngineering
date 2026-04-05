@@ -9,7 +9,11 @@ internal static class HostHelper
         return new HostBuilder()
             .ConfigureWebHost(webBuilder => webBuilder
                 .UseTestServer()
-                .ConfigureServices(s => s.AddRouting())
+                .ConfigureServices(s =>
+                {
+                    s.AddRouting();
+                    s.AddChaos(p => { });
+                })
                 .Configure(app =>
                 {
                     configureChaos(app);

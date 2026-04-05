@@ -5,23 +5,28 @@
 [SimpleJob]
 public class HandlerResolutionBenchmark
 {
+    private readonly IChaosHandlerRegistry _registry = new ChaosHandlerRegistry();
+
     [Benchmark]
     public void ResolveLatency() =>
-        ChaosHandlerRegistry.GetHandler(ChaosKind.Latency);
+        _registry.GetHandler(ChaosKind.Latency);
 
     [Benchmark]
     public void ResolveException() =>
-        ChaosHandlerRegistry.GetHandler(ChaosKind.Exception);
+        _registry.GetHandler(ChaosKind.Exception);
 
     [Benchmark]
     public void ResolveStatusCode() =>
-        ChaosHandlerRegistry.GetHandler(ChaosKind.StatusCode);
+        _registry.GetHandler(ChaosKind.StatusCode);
 
     [Benchmark]
     public void ResolveBandwidth() =>
-        ChaosHandlerRegistry.GetHandler(ChaosKind.BandwidthThrottle);
+        _registry.GetHandler(ChaosKind.BandwidthThrottle);
 
     [Benchmark]
-    public void ResolveUnknown() =>
-        ChaosHandlerRegistry.GetHandler((ChaosKind)999);
+    public void ResolveUnknown()
+    {
+        try { _registry.GetHandler((ChaosKind)999); }
+        catch (NotSupportedException) { /* expected */ }
+    }
 }

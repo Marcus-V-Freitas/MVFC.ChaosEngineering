@@ -1,4 +1,4 @@
-﻿# MVFC.ChaosEngineering
+# MVFC.ChaosEngineering
 
 A lightweight, high-performance ASP.NET Core middleware designed to inject controlled chaos into HTTP pipelines. It provides an essential toolkit for resilience testing in development and staging environments, helping teams build more robust distributed systems.
 
@@ -38,9 +38,10 @@ Modern distributed systems are prone to unpredictable failures: cascading timeou
 - **16 Diverse Chaos Kinds**: Simulate exceptions, latency, random 5xx errors, timeouts, connection aborts, header injection, service throttling (429), body corruption, and more.
 - **Fluent Configuration**: A readable, chainable `ChaosPolicyBuilder` API for effortless rule definition.
 - **Flexible Route Matching**: Target specific endpoints (`/api/orders`) or entire path segments (`/api/payments/**`) using wildcard patterns. Wildcards like `/**` now correctly include the base path (e.g., `/api/**` matches both `/api` and `/api/v1`).
-- **Deterministic Precedence**: Rules are automatically sorted by specificity. More specific patterns (longer strings) always take precedence over general wildcards, regardless of registration order.
+- **Multi-Rule Configuration**: Chain multiple `ForRoute` rules in a single policy. Rules are automatically sorted by specificity (path length), ensuring the most specific rule always wins.
 - **Probabilistic Execution**: Fine-tune how often each rule fires using a probability range from `0.0` to `1.0`.
 - **Request Filtering**: Scope chaos injection to specific requests based on HTTP headers (e.g., `X-Chaos: true`).
+- **Built-in Validation**: Automatic safety checks during `.Build()` to prevent misconfigurations (invalid probabilities, negative bandwidth, etc.).
 - **Dynamic Configuration**: Built-in support for `IOptionsMonitor`, allowing real-time policy updates without application restarts.
 - **Observability & Metrics**: Integrated structured logging and OpenTelemetry-ready metrics (`System.Diagnostics.Metrics`).
 - **Environment Gating**: Built-in safety mechanisms to restrict chaos to non-production environments.
@@ -171,7 +172,7 @@ To simulate realistic service degradation, the middleware supports three primary
 
 ### Internal Architecture
 
-The library follows a **Strategy Pattern** for fault injection. Each `ChaosKind` is handled by a specialized `IChaosHandler` implementation, ensuring the middleware remains clean, maintainable, and highly performant (O(1) resolution via an internal registry).
+The library follows a **Strategy Pattern** for fault injection. Each `ChaosKind` is handled by a specialized `IChaosHandler` implementation resolved via an internal **DI-Ready Registry**, ensuring the middleware remains clean, maintainable, and highly performant (O(1) resolution).
 
 ## Performance
 
