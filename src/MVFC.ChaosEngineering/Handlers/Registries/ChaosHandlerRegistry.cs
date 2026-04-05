@@ -6,7 +6,7 @@
 internal sealed class ChaosHandlerRegistry : IChaosHandlerRegistry
 {
     /// <summary>The dictionary mapping chaos kinds to their handlers.</summary>
-    private static readonly FrozenDictionary<ChaosKind, IChaosHandler> _handlers =
+    private readonly FrozenDictionary<ChaosKind, IChaosHandler> _handlers =
         new List<IChaosHandler>
         {
             new AbortHandler(),

@@ -3,6 +3,43 @@
 public sealed class ChaosMiddlewareTests
 {
     [Fact]
+    public void Evaluate_Probability50_HonorsDistribution()
+    {
+        const int ITERATIONS = 2000;
+        var firedCount = 0;
+        var policy = new ChaosPolicyBuilder()
+            .ForRoute("/api/orders")
+            .WithProbability(0.5)
+            .WithStatusCode(503)
+            .Build();
+        var context = HttpClientHelper.CreateContext("/api/orders");
+
+        for (var i = 0; i < ITERATIONS; i++)
+            if (policy.Evaluate(context) is not null) firedCount++;
+
+        var rate = (double)firedCount / ITERATIONS;
+        rate.Should().BeApproximately(0.5, 0.08);
+    }
+
+    [Fact]
+    public void Evaluate_FirstRuleNeverFires_FallsBackToWildcard()
+    {
+        var policy = new ChaosPolicyBuilder()
+            .ForRoute("/api/orders")
+            .WithProbability(0.0)
+            .WithStatusCode(503)
+            .ForRoute("/api/**")
+            .WithProbability(1.0)
+            .WithStatusCode(500)
+            .Build();
+
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/orders"));
+
+        rule.Should().NotBeNull();
+        rule!.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
     public async Task Middleware_Probability_HonorsConfiguredRate()
     {
         const int ITERATIONS = 1000;
