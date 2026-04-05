@@ -1,4 +1,4 @@
-# MVFC.ChaosEngineering
+﻿# MVFC.ChaosEngineering
 
 A lightweight, high-performance ASP.NET Core middleware designed to inject controlled chaos into HTTP pipelines. It provides an essential toolkit for resilience testing in development and staging environments, helping teams build more robust distributed systems.
 
@@ -169,11 +169,47 @@ To simulate realistic service degradation, the middleware supports three primary
 
 > **SlowBody vs BandwidthThrottle**: Use `SlowBody` when you need granular control over chunk size and timing. Use `BandwidthThrottle` when you want to simulate specific network throughput (e.g., 512 KB/s).
 
-### 🧠 Internal Architecture
+### Internal Architecture
 
 The library follows a **Strategy Pattern** for fault injection. Each `ChaosKind` is handled by a specialized `IChaosHandler` implementation, ensuring the middleware remains clean, maintainable, and highly performant (O(1) resolution via an internal registry).
 
-### 🧪 Dynamic Exception Factory
+## Performance
+
+Benchmarks measured on .NET 10.0 RyuJIT x86-64-v3 (12th Gen Intel Core i5-12500H).  
+Full source in [`benchmarks/`](benchmarks/).
+
+### Handler Resolution
+
+O(1) dictionary lookup — sub-nanosecond, zero allocations regardless of `ChaosKind`.
+
+| Method | Mean | Allocated |
+|---|---|---|
+| ResolveBandwidth | 0.82 ns | 0 B |
+| ResolveException | 0.82 ns | 0 B |
+| ResolveUnknown | 0.84 ns | 0 B |
+| ResolveStatusCode | 0.84 ns | 0 B |
+| ResolveLatency | 0.87 ns | 0 B |
+
+### Route Matching
+
+| Method | Mean | Allocated |
+|---|---|---|
+| NoMatch | 4.24 ns | 0 B |
+| ExactMatch | 4.45 ns | 0 B |
+| HeaderMatch | 15.64 ns | 24 B |
+| WildcardMatch | 18.59 ns | 0 B |
+
+### Middleware Pipeline Overhead
+
+| Scenario | Mean | Overhead | Allocated |
+|---|---|---|---|
+| No chaos registered | 5.33 μs | baseline | 7.25 KB |
+| Chaos registered, no match | 5.48 μs | +3% | 7.28 KB |
+| Chaos registered, match + inject | 6.20 μs | +16% | 7.94 KB |
+
+> The **+3% overhead** (≈150 ns) represents the cost of route evaluation when no rule matches — virtually invisible in production. The **+16%** reflects the actual fault injection cost, not middleware overhead.
+
+### Dynamic Exception Factory
 
 You can now use a factory to decide which exception to throw based on the current `HttpContext`:
 

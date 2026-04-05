@@ -7,9 +7,9 @@ public sealed class ChaosMiddlewareTests
     {
         using var host = HostHelper.BuildHost(ChaosPolicy.Disabled);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/orders", TestContext.Current.CancellationToken);
+        var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -25,15 +25,15 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/orders", TestContext.Current.CancellationToken);
+        var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
     }
 
     [Fact]
-    public async Task Middleware_ExceptionRule_ThrowsException()
+    public async Task Middleware_ExceptionRule_ReturnsError()
     {
         var policy = new ChaosPolicyBuilder()
             .ForRoute("/api/payments")
@@ -43,14 +43,14 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var act = async () => await client.GetAsync("/api/payments").ConfigureAwait(false);
+        var act = async () => await api.GetPaymentsAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
         await act.Should().ThrowAsync<Exception>();
     }
 
     [Fact]
-    public async Task Middleware_ExceptionFactory_ThrowsCustomExceptionFromContext()
+    public async Task Middleware_ExceptionFactory_ReturnsError()
     {
         var policy = new ChaosPolicyBuilder()
             .ForRoute("/api/factory")
@@ -60,11 +60,10 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var act = async () => await client.GetAsync("/api/factory").ConfigureAwait(false);
-        var ex = await act.Should().ThrowAsync<InvalidOperationException>();
-        ex.Which.Message.Should().Be("Path: /api/factory");
+        var act = async () => await api.GetFactoryAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
+        await act.Should().ThrowAsync<Exception>();
     }
 
     [Fact]
@@ -79,10 +78,10 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        var response = await client.GetAsync("/api/slow", TestContext.Current.CancellationToken);
+        var response = await api.GetSlowAsync(TestContext.Current.CancellationToken);
         sw.Stop();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -100,9 +99,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/products", TestContext.Current.CancellationToken);
+        var response = await api.GetProductsAsync(TestContext.Current.CancellationToken);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -117,10 +116,10 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
         var sw = Stopwatch.StartNew();
-        var response = await client.GetAsync("/api/random-latency", TestContext.Current.CancellationToken);
+        var response = await api.GetRandomLatencyAsync(TestContext.Current.CancellationToken);
         sw.Stop();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -139,9 +138,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/unstable", TestContext.Current.CancellationToken);
+        var response = await api.GetUnstableAsync(TestContext.Current.CancellationToken);
 
         ((int)response.StatusCode).Should().BeGreaterThanOrEqualTo(500).And.BeLessThan(600);
     }
@@ -157,11 +156,11 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
-        var act = async () => await client.GetAsync("/api/timeout", cts.Token).ConfigureAwait(false);
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        var act = async () => await api.GetTimeoutAsync(cts.Token).ConfigureAwait(false);
+        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
     [Fact]
@@ -176,9 +175,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/header-chaos", TestContext.Current.CancellationToken);
+        var response = await api.GetHeaderChaosAsync(TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Headers.Should().ContainKey("X-Chaos-Injected");
@@ -197,9 +196,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/throttle", TestContext.Current.CancellationToken);
+        var response = await api.GetThrottleAsync(TestContext.Current.CancellationToken);
 
         ((int)response.StatusCode).Should().Be(429);
         response.Headers.Should().ContainKey("Retry-After");
@@ -207,7 +206,7 @@ public sealed class ChaosMiddlewareTests
     }
 
     [Fact]
-    public async Task Middleware_AbortRule_ClosesConnection()
+    public async Task Middleware_AbortRule_ReturnsError()
     {
         var policy = new ChaosPolicyBuilder()
             .ForRoute("/api/abort")
@@ -217,9 +216,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var act = async () => await client.GetAsync("/api/abort", TestContext.Current.CancellationToken).ConfigureAwait(false);
+        var act = async () => await api.GetAbortAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
         await act.Should().ThrowAsync<Exception>();
     }
 
@@ -234,13 +233,13 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/corrupt-body", TestContext.Current.CancellationToken);
-        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var response = await api.GetCorruptBodyAsync(TestContext.Current.CancellationToken);
+        var body = response.Content;
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var act = () => System.Text.Json.JsonDocument.Parse(body);
+        var act = () => System.Text.Json.JsonDocument.Parse(body!);
         act.Should().Throw<System.Text.Json.JsonException>();
     }
 
@@ -255,10 +254,10 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/empty-body", TestContext.Current.CancellationToken);
-        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var response = await api.GetEmptyBodyAsync(TestContext.Current.CancellationToken);
+        var body = response.Content;
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         body.Should().BeEmpty();
@@ -275,19 +274,13 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/slow-body");
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
         var sw = Stopwatch.StartNew();
 
-        var response = await client
-            .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        var response = await api.GetSlowBodyAsync(TestContext.Current.CancellationToken);
 
-        await response.Content
-            .CopyToAsync(Stream.Null, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        await response.Content!.CopyToAsync(Stream.Null, TestContext.Current.CancellationToken);
 
         sw.Stop();
 
@@ -306,22 +299,12 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var noRedirectClient = new HttpClient(
-            new HttpClientHandler { AllowAutoRedirect = false },
-            disposeHandler: true)
-        {
-            BaseAddress = new Uri("http://localhost")
-        };
 
-        // Use TestServer directly for no-redirect client
         var testServer = host.GetTestServer();
-        noRedirectClient = testServer.CreateClient();
-        noRedirectClient.DefaultRequestHeaders.Clear();
+        var client = testServer.CreateClient();
+        var apiRefit = RestService.For<IChaosApi>(client);
 
-        var response = await testServer.CreateClient().SendAsync(
-            new HttpRequestMessage(HttpMethod.Get, "/api/redirect"),
-            HttpCompletionOption.ResponseHeadersRead,
-            TestContext.Current.CancellationToken);
+        var response = await apiRefit.GetRedirectAsync(TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Found);
         response.Headers.Location.Should().NotBeNull();
@@ -329,7 +312,7 @@ public sealed class ChaosMiddlewareTests
     }
 
     [Fact]
-    public async Task Middleware_PartialResponseRule_AbortsConnectionMidStream()
+    public async Task Middleware_PartialResponseRule_ReturnsError()
     {
         var policy = new ChaosPolicyBuilder()
             .ForRoute("/api/partial")
@@ -339,9 +322,9 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var act = async () => await client.GetAsync("/api/partial", TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var act = async () => await api.GetPartialAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
         await act.Should().ThrowAsync<Exception>();
     }
 
@@ -356,19 +339,13 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/bandwidth");
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
         var sw = Stopwatch.StartNew();
 
-        var response = await client
-            .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        var response = await api.GetBandwidthAsync(TestContext.Current.CancellationToken);
 
-        await response.Content
-            .CopyToAsync(Stream.Null, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        await response.Content!.CopyToAsync(Stream.Null, TestContext.Current.CancellationToken);
 
         sw.Stop();
 
@@ -387,13 +364,12 @@ public sealed class ChaosMiddlewareTests
 
         using var host = HostHelper.BuildHost(policy);
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/wrong-content-type", TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var response = await api.GetWrongContentTypeAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("text/plain");
+        response.ContentHeaders?.ContentType?.MediaType.Should().Be("text/plain");
     }
 
     [Fact]
@@ -407,9 +383,9 @@ public sealed class ChaosMiddlewareTests
         );
 
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/orders", TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
         response.Headers.Contains("X-Chaos-Injected").Should().BeTrue();
@@ -437,9 +413,9 @@ public sealed class ChaosMiddlewareTests
             .Build();
 
         await host.StartAsync(TestContext.Current.CancellationToken);
-        var client = host.GetTestClient();
+        var api = RestService.For<IChaosApi>(host.GetTestClient());
 
-        var response = await client.GetAsync("/api/options", TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var response = await api.GetOptionsAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
     }

@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering;
+﻿namespace MVFC.ChaosEngineering;
 
 /// <summary>
 /// Positional record that defines a chaos rule with its matching pattern and injection parameters.
@@ -61,9 +61,9 @@ internal sealed record ChaosRule(
         bool pathMatch;
         if (Pattern.EndsWith("/**", StringComparison.Ordinal))
         {
-            var prefix = Pattern[..^3];
-            pathMatch = string.Equals(path, prefix, StringComparison.OrdinalIgnoreCase) ||
-                        path.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase);
+            var prefix = Pattern.AsSpan()[..^3];
+            pathMatch = path.AsSpan().StartsWith(prefix, StringComparison.OrdinalIgnoreCase) &&
+                        (path.Length == prefix.Length || path[prefix.Length] == '/');
         }
         else
         {

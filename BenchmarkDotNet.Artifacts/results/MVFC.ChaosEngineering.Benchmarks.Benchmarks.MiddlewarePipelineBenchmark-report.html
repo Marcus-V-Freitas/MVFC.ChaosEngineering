@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>MVFC.ChaosEngineering.Benchmarks.Benchmarks.MiddlewarePipelineBenchmark-20260404-212518</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.26200.8117/25H2/2025Update/HudsonValley2)
+12th Gen Intel Core i5-12500H 2.50GHz, 1 CPU, 16 logical and 12 physical cores
+.NET SDK 10.0.100
+  [Host] : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>Toolchain=InProcessNoEmitToolchain  IterationCount=20  WarmupCount=5  
+</code></pre>
+
+<table>
+<thead><tr><th>Method           </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>NoChaos</td><td>5.332 &mu;s</td><td>0.1426 &mu;s</td><td>0.1585 &mu;s</td><td>1.00</td><td>0.04</td><td>0.7324</td><td>-</td><td>7.25 KB</td><td>1.00</td>
+</tr><tr><td>ChaosRegistered_NoMatch</td><td>5.483 &mu;s</td><td>0.1912 &mu;s</td><td>0.2201 &mu;s</td><td>1.03</td><td>0.05</td><td>0.7935</td><td>0.0076</td><td>7.28 KB</td><td>1.00</td>
+</tr><tr><td>ChaosRegistered_Match</td><td>6.200 &mu;s</td><td>0.1067 &mu;s</td><td>0.1228 &mu;s</td><td>1.16</td><td>0.04</td><td>0.8621</td><td>0.0305</td><td>7.94 KB</td><td>1.10</td>
+</tr></tbody></table>
+</body>
+</html>

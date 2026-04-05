@@ -16,4 +16,6 @@ global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.TestHost;
 global using Microsoft.Extensions.DependencyInjection;
 global using MVFC.ChaosEngineering.Extensions;
+global using Refit;
+global using MVFC.ChaosEngineering.Tests.Api;
 global using MVFC.ChaosEngineering.Tests.Helpers;

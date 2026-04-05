@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Tests;
+﻿namespace MVFC.ChaosEngineering.Tests;
 
 public sealed class ChaosRuleTests
 {
@@ -13,21 +13,21 @@ public sealed class ChaosRuleTests
     public void Matches_ShouldRespectPatternSemantics(string path, string pattern, bool expected)
     {
         var rule = new ChaosRule(Pattern: pattern);
-        rule.Matches(HostHelper.CreateContext(path)).Should().Be(expected);
+        rule.Matches(HttpClientHelper.CreateContext(path)).Should().Be(expected);
     }
 
     [Fact]
     public void Matches_EmptyPattern_ReturnsFalse()
     {
         var rule = new ChaosRule(Pattern: string.Empty);
-        rule.Matches(HostHelper.CreateContext("/api/anything")).Should().BeFalse();
+        rule.Matches(HttpClientHelper.CreateContext("/api/anything")).Should().BeFalse();
     }
 
     [Fact]
     public void Matches_WhitespacePattern_ReturnsFalse()
     {
         var rule = new ChaosRule(Pattern: "   ");
-        rule.Matches(HostHelper.CreateContext("/api/anything")).Should().BeFalse();
+        rule.Matches(HttpClientHelper.CreateContext("/api/anything")).Should().BeFalse();
     }
 
     [Fact]

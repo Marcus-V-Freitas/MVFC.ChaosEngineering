@@ -1,4 +1,4 @@
-# MVFC.ChaosEngineering
+﻿# MVFC.ChaosEngineering
 
 Um middleware leve e de alta performance para ASP.NET Core, projetado para injetar caos controlado em pipelines HTTP. Fornece um conjunto essencial de ferramentas para testes de resiliência em ambientes de desenvolvimento e staging, auxiliando equipes na construção de sistemas distribuídos mais robustos.
 
@@ -169,11 +169,47 @@ Para simular a degradação real do serviço, o middleware suporta três comport
 
 > **SlowBody vs BandwidthThrottle**: Use `SlowBody` quando precisar de controle granular sobre o tamanho dos pacotes e o tempo. Use `BandwidthThrottle` para simular uma taxa de rede específica (ex: 512 KB/s).
 
-### 🧠 Arquitetura Interna
+### Arquitetura Interna
 
 A biblioteca segue o **Padrão Strategy** para injeção de falhas. Cada `ChaosKind` é gerenciado por uma implementação especializada de `IChaosHandler`, garantindo que o middleware permaneça limpo, sustentável e de alta performance (resolução O(1) via registro interno).
 
-### 🧪 Dynamic Exception Factory
+## Performance
+
+Benchmarks medidos no .NET 10.0 RyuJIT x86-64-v3 (Intel Core i5-12500H 12ª geração).  
+Código-fonte completo em [`benchmarks/`](benchmarks/).
+
+### Resolução de Handler
+
+Lookup O(1) via dictionary — sub-nanosegundo, zero alocações independente do `ChaosKind`.
+
+| Método | Média | Alocado |
+|---|---|---|
+| ResolveBandwidth | 0,82 ns | 0 B |
+| ResolveException | 0,82 ns | 0 B |
+| ResolveUnknown | 0,84 ns | 0 B |
+| ResolveStatusCode | 0,84 ns | 0 B |
+| ResolveLatency | 0,87 ns | 0 B |
+
+### Correspondência de Rota
+
+| Método | Média | Alocado |
+|---|---|---|
+| NoMatch | 4,24 ns | 0 B |
+| ExactMatch | 4,45 ns | 0 B |
+| HeaderMatch | 15,64 ns | 24 B |
+| WildcardMatch | 18,59 ns | 0 B |
+
+### Overhead do Pipeline de Middleware
+
+| Cenário | Média | Overhead | Alocado |
+|---|---|---|---|
+| Sem caos registrado | 5,33 μs | baseline | 7,25 KB |
+| Caos registrado, sem match | 5,48 μs | +3% | 7,28 KB |
+| Caos registrado, match + injeção | 6,20 μs | +16% | 7,94 KB |
+
+> O overhead de **+3%** (≈150 ns) representa o custo da avaliação de rota quando nenhuma regra dispara — praticamente imperceptível em produção. O **+16%** reflete o custo real da injeção de falha, não o overhead do middleware em si.
+
+### Dynamic Exception Factory
 
 Agora você pode usar uma factory para decidir qual exceção lançar com base no `HttpContext` atual:
 

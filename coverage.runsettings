@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
@@ -6,9 +6,9 @@
         <Configuration>
           <Format>cobertura</Format>
           <Include>[MVFC.ChaosEngineering*]*</Include>
-          <Exclude>[*.Tests]*,[*.Playground]*,[*.AppHost]*</Exclude>
+          <Exclude>[*.Tests]*,[*.Playground]*,[*.AppHost]*,[*.Benchmarks]*</Exclude>
           <ExcludeByAttribute>ExcludeFromCodeCoverage,GeneratedCode,CompilerGenerated</ExcludeByAttribute>
-          <ExcludeByFile>**/tests/**/*.cs,**/playground/**/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/tests/**/*.cs,**/playground/**/*.cs,**/benchmarks/**/*.cs</ExcludeByFile>
           <SingleHit>false</SingleHit>
           <UseSourceLink>true</UseSourceLink>
           <IncludeTestAssembly>false</IncludeTestAssembly>

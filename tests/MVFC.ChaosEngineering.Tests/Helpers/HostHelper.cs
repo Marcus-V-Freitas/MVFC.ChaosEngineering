@@ -3,20 +3,7 @@
 internal static class HostHelper
 {
     private const string PATTERN = "/{**path}";
-
-    internal static DefaultHttpContext CreateContext(string path, string? headerName = null, string? headerValue = null)
-    {
-        var context = new DefaultHttpContext();
-        context.Request.Path = path;
-
-        if (headerName != null)
-        {
-            context.Request.Headers[headerName] = headerValue ?? string.Empty;
-        }
-
-        return context;
-    }
-
+   
     internal static IHost BuildHost(ChaosPolicy policy) =>
         BuildHostInternal(app => app.UseChaos(policy));
 

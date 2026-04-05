@@ -17,42 +17,43 @@ dotnet build MVFC.ChaosEngineering.slnx --configuration Release
 
 ## Running tests
 
-The tests use `Aspire.Hosting.Testing` and require Docker to be running.
+The tests use `Aspire.Hosting.Testing` for playground orchestration and require Docker to be running.
 
 ```sh
 dotnet test tests/MVFC.ChaosEngineering.Tests/MVFC.ChaosEngineering.Tests.csproj --configuration Release
 ```
 
-## Adding a new helper
+## Adding a new Chaos Kind
 
-1. Create a new folder under `src/MVFC.ChaosEngineering.{ServiceName}/`
-2. Follow the structure of an existing helper (e.g. `MVFC.ChaosEngineering.Redis`)
-3. Add the new project to `MVFC.ChaosEngineering.slnx`
-4. Add the package version to `Directory.Packages.props`
-5. Add integration tests in `tests/MVFC.ChaosEngineering.Tests/`
-6. Update `README.md` and `README.pt-BR.md` with the new package entry
+To implement a new type of fault injection:
+
+1.  **Define the Kind**: Add a new entry to the `ChaosKind` enum in `src/MVFC.ChaosEngineering/Enums/ChaosKind.cs`.
+2.  **Implement the Handler**: Create a new class implementing `IChaosHandler` in `src/MVFC.ChaosEngineering/Handlers/`.
+3.  **Register the Handler**: Map the new `ChaosKind` to your handler in `ChaosHandlerRegistry.cs`.
+4.  **Extend the Builder**: Add the corresponding fluent methods to `ChaosPolicyBuilder.cs` and `ChaosRule.cs` to allow users to configure the new fault.
+5.  **Test**: Add unit and integration tests in `tests/MVFC.ChaosEngineering.Tests/`.
+6.  **Document**: Update `README.md` and `README.pt-BR.md` tables and diagrams.
 
 ## Branch naming
 
-- `feat/` — new feature or helper
+- `feat/` — new feature or Chaos Kind
 - `fix/` — bug fix
 - `chore/` — dependency update or maintenance
 - `docs/` — documentation only
 - `test/` — tests only
 - `refactor/` — no feature change, no bug fix
 
-Example: `feat/add-chaos-helper`
+Example: `feat/add-network-partition-kind`
 
 ## Commit convention
 
 This project follows [Conventional Commits](https://www.conventionalcommits.org/):
 
-- `feat: add Kafka helper`
-- `fix: fix MongoDB replica set initialization timeout`
-- `docs: update README badges`
-- `chore: bump Aspire.Hosting to 13.2.0`
-- `test: add WireMock integration tests`
-- `refactor: simplify Redis commander setup`
+- `feat: add BandwidthThrottle kind`
+- `fix: fix specificity matching for deep wildcards`
+- `docs: update README diagrams`
+- `chore: bump Microsoft.Extensions.Http to 9.0.0`
+- `test: add integration tests for SlowBody kind`
 
 ## Pull Request process
 
@@ -61,3 +62,4 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 3. Open a PR against `main` and fill in the PR template
 4. Wait for the CI to pass
 5. A maintainer will review and merge
+

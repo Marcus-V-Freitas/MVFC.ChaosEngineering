@@ -3,19 +3,23 @@
 public sealed class AppHostFixture : IAsyncLifetime
 {
     private ProjectAppHost _appHost = default!;
+    private HttpClient _client = default!;
 
-    internal HttpClient Client { get; private set; } = default!;
+    public IChaosApi Api { get; private set; } = default!;
 
     public async ValueTask InitializeAsync()
     {
         _appHost = new ProjectAppHost();
+
         await _appHost.StartAsync().ConfigureAwait(false);
-        Client = _appHost.CreateHttpClient("chaos-api");
+
+        _client = _appHost.CreateClient();
+        Api = RestService.For<IChaosApi>(_client);
     }
 
     public async ValueTask DisposeAsync()
     {
-        Client?.Dispose();
+        _client?.Dispose();
         await _appHost.DisposeAsync().ConfigureAwait(false);
     }
 }

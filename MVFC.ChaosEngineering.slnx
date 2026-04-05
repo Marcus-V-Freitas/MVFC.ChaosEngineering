@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/MVFC.ChaosEngineering.Benchmarks/MVFC.ChaosEngineering.Benchmarks.csproj" Id="1fe391a2-f01a-4a4e-aecc-a811a948efed" />
+  </Folder>
   <Folder Name="/playground/">
     <Project Path="playground/MVFC.ChaosEngineering.Playground.Api/MVFC.ChaosEngineering.Playground.Api.csproj" />
     <Project Path="playground/MVFC.ChaosEngineering.Playground.AppHost/MVFC.ChaosEngineering.Playground.AppHost.csproj" />

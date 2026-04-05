@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Diagnostics;
+﻿namespace MVFC.ChaosEngineering.Diagnostics;
 
 /// <summary>
 /// Provides instrumentation for chaos engineering activities, including metrics for injected faults.
@@ -13,7 +13,7 @@ internal sealed class ChaosInstrumentation : IDisposable
     /// <summary>Initializes a new instance of the <see cref="ChaosInstrumentation"/> class.</summary>
     public ChaosInstrumentation()
     {
-        _meter = new Meter("MVFC.ChaosEngineering", "1.0.0");
+        _meter = new Meter("MVFC.ChaosEngineering");
 
         _faultsCounter = _meter.CreateCounter<long>(
             "chaos.faults.injected",

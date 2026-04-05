@@ -1,0 +1,16 @@
+﻿global using BenchmarkDotNet.Running;
+global using Microsoft.AspNetCore.Http;
+global using BenchmarkDotNet.Attributes;
+global using BenchmarkDotNet.Order;
+global using MVFC.ChaosEngineering.Benchmarks.Helpers;
+global using MVFC.ChaosEngineering.Handlers;
+global using MVFC.ChaosEngineering.Enums;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.AspNetCore.TestHost;
+global using Microsoft.Extensions.Hosting;
+global using MVFC.ChaosEngineering.Extensions;
+global using Microsoft.Extensions.DependencyInjection;
+global using BenchmarkDotNet.Configs;
+global using BenchmarkDotNet.Jobs;
+global using BenchmarkDotNet.Toolchains.InProcess.NoEmit;

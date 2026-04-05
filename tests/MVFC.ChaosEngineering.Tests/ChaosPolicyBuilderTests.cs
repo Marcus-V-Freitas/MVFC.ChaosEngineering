@@ -10,7 +10,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public sealed class ChaosPolicyBuilderTests
             .Build();
 
         policy.Should().BeSameAs(ChaosPolicy.Disabled);
-        policy.Evaluate(HostHelper.CreateContext("/api")).Should().BeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api")).Should().BeNull();
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class ChaosPolicyBuilderTests
             .WithProbability(1.0)
             .Build();
 
-        policy.Evaluate(HostHelper.CreateContext("/api")).Should().NotBeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api")).Should().NotBeNull();
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class ChaosPolicyBuilderTests
             .Build();
 
         // /api/orders (len 11) is more specific than /api/** (len 7)
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/orders"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/orders"));
         rule.Should().NotBeNull();
         rule!.Kind.Should().Be(ChaosKind.Abort);
     }

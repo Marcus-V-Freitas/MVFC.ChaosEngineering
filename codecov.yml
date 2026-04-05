@@ -4,6 +4,7 @@
 ignore:
   - "tests/**"
   - "playground/**"
+  - "benchmarks/**"
 
 coverage:
   status:

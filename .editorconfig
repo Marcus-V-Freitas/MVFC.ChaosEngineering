@@ -457,6 +457,18 @@ dotnet_diagnostic.S4457.severity = none
 [*.cs]
 dotnet_diagnostic.CA1859.severity = none
 
+# Ignora o aviso CA1822 (Mark members as static) para todo o projeto
+[*.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+# Ignora o aviso CA1822 (Mark members as static) para todo o projeto
+[*.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+# Ignora o aviso S1144 (SonarAnalyzer: Remove unused private methods) para todo o projeto
+[*.cs]
+dotnet_diagnostic.S1144.severity = none
+
 # ──────────────────────────────────────────────────────────
 # 14. ROSLYNATOR — principais
 # ──────────────────────────────────────────────────────────

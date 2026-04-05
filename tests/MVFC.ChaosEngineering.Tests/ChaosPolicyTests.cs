@@ -9,7 +9,7 @@ public sealed class ChaosPolicyTests
             .ForRoute("/api/orders")
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/payments"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/payments"));
 
         rule.Should().BeNull();
     }
@@ -23,7 +23,7 @@ public sealed class ChaosPolicyTests
             .WithKind(ChaosKind.Exception)
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/orders"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/orders"));
 
         rule.Should().NotBeNull();
         rule!.Kind.Should().Be(ChaosKind.Exception);
@@ -37,7 +37,7 @@ public sealed class ChaosPolicyTests
             .WithProbability(0.0)
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/orders"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/orders"));
 
         rule.Should().BeNull();
     }
@@ -51,7 +51,7 @@ public sealed class ChaosPolicyTests
             .WithLatency(TimeSpan.FromMilliseconds(500))
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/orders/123"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/orders/123"));
 
         rule.Should().NotBeNull();
         rule!.Kind.Should().Be(ChaosKind.Latency);
@@ -67,7 +67,7 @@ public sealed class ChaosPolicyTests
             .WithStatusCode(503)
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/products"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/products"));
 
         rule.Should().NotBeNull();
         rule!.Kind.Should().Be(ChaosKind.StatusCode);
@@ -83,7 +83,7 @@ public sealed class ChaosPolicyTests
             .WithException<TimeoutException>()
             .Build();
 
-        var rule = policy.Evaluate(HostHelper.CreateContext("/api/payments"));
+        var rule = policy.Evaluate(HttpClientHelper.CreateContext("/api/payments"));
 
         rule.Should().NotBeNull();
         rule!.ExceptionType.Should().Be<TimeoutException>();
@@ -100,19 +100,19 @@ public sealed class ChaosPolicyTests
             .Build();
 
         // No header
-        policy.Evaluate(HostHelper.CreateContext("/api/orders")).Should().BeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api/orders")).Should().BeNull();
 
         // Wrong header value
-        policy.Evaluate(HostHelper.CreateContext("/api/orders", "X-Chaos", "false")).Should().BeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api/orders", "X-Chaos", "false")).Should().BeNull();
 
         // Correct header
-        policy.Evaluate(HostHelper.CreateContext("/api/orders", "X-Chaos", "true")).Should().NotBeNull();
+        policy.Evaluate(HttpClientHelper.CreateContext("/api/orders", "X-Chaos", "true")).Should().NotBeNull();
     }
 
     [Fact]
     public void Disabled_NeverInjectsForAnyPath()
     {
-        var rule = ChaosPolicy.Disabled.Evaluate(HostHelper.CreateContext("/api/anything"));
+        var rule = ChaosPolicy.Disabled.Evaluate(HttpClientHelper.CreateContext("/api/anything"));
         rule.Should().BeNull();
     }
 }

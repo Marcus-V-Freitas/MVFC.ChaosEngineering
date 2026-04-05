@@ -1,4 +1,4 @@
-namespace MVFC.ChaosEngineering.Handlers;
+﻿namespace MVFC.ChaosEngineering.Handlers;
 
 /// <summary>
 /// Defines a handler for a specific kind of chaos fault.

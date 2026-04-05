@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -30,4 +30,14 @@
   <ItemGroup Condition="$([System.String]::new('$(MSBuildProjectDirectory)').Contains('playground'))">
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(AssemblyName)' == 'MVFC.ChaosEngineering'">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>MVFC.ChaosEngineering.Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>MVFC.ChaosEngineering.Benchmarks</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
