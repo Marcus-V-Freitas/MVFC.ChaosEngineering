@@ -8,6 +8,7 @@ internal static class HttpClientHelper
         var handler = new HttpClientHandler
         {
             AllowAutoRedirect = false,
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
         };
 
         return new HttpClient(handler)
