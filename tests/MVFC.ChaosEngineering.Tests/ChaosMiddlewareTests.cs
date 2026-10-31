@@ -229,7 +229,7 @@ public sealed class ChaosMiddlewareTests
 
         var response = await api.GetUnstableAsync(TestContext.Current.CancellationToken);
 
-        ((int)response.StatusCode).Should().BeGreaterThanOrEqualTo(500).And.BeLessThan(600);
+        ((int)response.StatusCode!.Value).Should().BeGreaterThanOrEqualTo(500).And.BeLessThan(600);
     }
 
     [Fact]
@@ -287,7 +287,7 @@ public sealed class ChaosMiddlewareTests
 
         var response = await api.GetThrottleAsync(TestContext.Current.CancellationToken);
 
-        ((int)response.StatusCode).Should().Be(429);
+        ((int)response.StatusCode!.Value).Should().Be(429);
         response.Headers.Should().ContainKey("Retry-After");
         response.Headers.GetValues("Retry-After").Should().ContainSingle(v => v == "5");
     }
@@ -394,7 +394,7 @@ public sealed class ChaosMiddlewareTests
         var response = await apiRefit.GetRedirectAsync(TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Found);
-        response.Headers.Location.Should().NotBeNull();
+        response.Headers!.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().Be("/api/products");
     }
 
@@ -475,7 +475,7 @@ public sealed class ChaosMiddlewareTests
         var response = await api.GetOrdersAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
-        response.Headers.Contains("X-Chaos-Injected").Should().BeTrue();
+        response.Headers!.Contains("X-Chaos-Injected").Should().BeTrue();
     }
 
     [Fact]

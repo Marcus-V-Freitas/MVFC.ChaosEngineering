@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.5] - 2026-10-31
+
+### Added
+- Enabled `CentralPackageTransitivePinningEnabled` in `Directory.Packages.props`.
+- Added `MessagePack` package dependency.
+
+### Changed
+- Updated NuGet package dependencies (`Microsoft.Testing.Platform`, `Microsoft.NET.Test.Sdk`, `xunit.v3`, `xunit.runner.visualstudio`, `coverlet.collector`, `FluentAssertions`, `SonarAnalyzer.CSharp`, `MinVer`, `Aspire.Hosting.*`, `Microsoft.AspNetCore.TestHost`, and `Refit`).
+- Updated `Aspire.AppHost.Sdk` to `13.6.0` in `MVFC.ChaosEngineering.Playground.AppHost`.
+- Adjusted test assertions and `IChaosApi` interface to support updated `Refit` nullability and response handling.
+
 ## [1.3.4] - 2026-08-30
 
 ### Added
@@ -98,6 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% Test Coverage**: Fully verified library with 100% line and branch coverage.
 - **Comprehensive Documentation**: Complete XML comments and bi-lingual (EN/PT-BR) READMEs.
 
+[1.3.5]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.1...v1.3.2

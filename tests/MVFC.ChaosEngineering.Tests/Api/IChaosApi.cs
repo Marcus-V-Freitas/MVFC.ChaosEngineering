@@ -57,7 +57,7 @@ public interface IChaosApi
     public Task<string> GetAbortAsync(CancellationToken ct = default);
 
     [Get("/api/factory")]
-    public Task<ApiResponse<string>> GetFactoryAsync(CancellationToken ct = default);
+    public Task<string> GetFactoryAsync(CancellationToken ct = default);
 
     [Get("/api/options")]
     public Task<ApiResponse<string>> GetOptionsAsync(CancellationToken ct = default);

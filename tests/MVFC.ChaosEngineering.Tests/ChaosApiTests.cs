@@ -41,7 +41,9 @@ public sealed class ChaosApiTests(AppHostFixture fixture) : IClassFixture<AppHos
                 HttpStatusCode.BadGateway,
                 HttpStatusCode.ServiceUnavailable,
                 HttpStatusCode.GatewayTimeout);
-            statuses.Add(response.StatusCode);
+
+            if (response.StatusCode is not null)
+                statuses.Add(response.StatusCode.Value);
         }
         statuses.Count.Should().BeGreaterThan(1);
     }
@@ -68,7 +70,7 @@ public sealed class ChaosApiTests(AppHostFixture fixture) : IClassFixture<AppHos
     {
         var response = await _api.GetThrottleAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
         response.StatusCode.Should().Be((HttpStatusCode)429);
-        response.Headers.TryGetValues("Retry-After", out var values).Should().BeTrue();
+        response.Headers!.TryGetValues("Retry-After", out var values).Should().BeTrue();
         values!.Should().ContainSingle(v => v == "10");
     }
 
@@ -110,8 +112,9 @@ public sealed class ChaosApiTests(AppHostFixture fixture) : IClassFixture<AppHos
     public async Task ForcedRedirect_ShouldReturn302WithLocationHeader()
     {
         var response = await _api.GetRedirectAsync(TestContext.Current.CancellationToken).ConfigureAwait(true);
+        response.StatusCode.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.Found);
-        response.Headers.Location.Should().NotBeNull();
+        response.Headers!.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().Be("/api/products");
     }
 
