@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.6] - 2026-11-07
+
+### Added
+- **OIDC Trusted Publishing**: Configured `NuGet/login@v1` action for keyless OIDC authentication to NuGet.org.
+- **CI Workflow Optimization**: Added `check-main-push` job to prevent redundant test runs on `main` when commits originate from merged pull requests.
+- **Dual SDK Support in CI**: Configured .NET 9 and 10 SDKs setup in GitHub Actions.
+
+### Changed
+- **CI / CD Pipeline Hardening**:
+  - Pinned Cake execution using `dotnet tool restore` and `dotnet tool run dotnet-cake`.
+  - Added workflow concurrency control (`cancel-in-progress`) for non-tag runs.
+  - Enforced validation checks and safe globbing in NuGet packaging and publishing steps.
+  - Scoped PR coverage comments to internal pull requests.
+- **Documentation & Badges**:
+  - Updated CI and Codecov badges to explicitly track the `main` branch.
+  - Standardized markdown table formatting across root and package documentation in both English and Portuguese.
+
+### Removed
+- Removed `cleanup-tag-on-failure` workflow job.
+
 ## [1.3.5] - 2026-10-31
 
 ### Added
@@ -109,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% Test Coverage**: Fully verified library with 100% line and branch coverage.
 - **Comprehensive Documentation**: Complete XML comments and bi-lingual (EN/PT-BR) READMEs.
 
+[1.3.6]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.2...v1.3.3

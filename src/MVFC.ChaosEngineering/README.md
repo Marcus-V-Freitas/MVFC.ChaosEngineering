@@ -2,8 +2,8 @@
 
 A lightweight, high-performance ASP.NET Core middleware designed to inject controlled chaos into HTTP pipelines. It provides an essential toolkit for resilience testing in development and staging environments, helping teams build more robust distributed systems.
 
-[![CI](https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/Marcus-V-Freitas/MVFC.ChaosEngineering/branch/main/graph/badge.svg)](https://codecov.io/gh/Marcus-V-Freitas/MVFC.ChaosEngineering)
+[![CI](https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Marcus-V-Freitas/MVFC.ChaosEngineering/branch/main/graph/badge.svg?branch=main)](https://codecov.io/gh/Marcus-V-Freitas/MVFC.ChaosEngineering)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 ![Platform](https://img.shields.io/badge/.NET-9%20%7C%2010-blue)
 ![NuGet Version](https://img.shields.io/nuget/v/MVFC.ChaosEngineering)
@@ -19,8 +19,8 @@ A lightweight, high-performance ASP.NET Core middleware designed to inject contr
 
 Rules are matched using route patterns (with deterministic specificity precedence), evaluated based on configurable probabilities, and strictly scoped to specific environments to ensure that chaos never inadvertently impacts production workloads.
 
-| Package | Service | Downloads |
-|---|---|---|
+| Package                                                          | Service                                                   | Downloads                                                           |
+| ---------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------- |
 | **[MVFC.ChaosEngineering](src/MVFC.ChaosEngineering/README.md)** | Chaos injection middleware for ASP.NET Core applications. | ![Downloads](https://img.shields.io/nuget/dt/MVFC.ChaosEngineering) |
 
 ---
@@ -149,24 +149,24 @@ To simulate realistic service degradation, the middleware supports three primary
 - **Pass-through + delay**: The request continues normally, but an artificial delay is introduced before forwarding.
 - **Pass-through + intercept**: The middleware calls the next handler, captures the response, and modifies it before sending it to the client.
 
-| Kind | Description | Behavior |
-|---|---|---|
-| `Exception` | Throws a configured exception (defaults to `ChaosException`). | Short-circuit |
-| `Latency` | Introduces a fixed artificial delay. | Pass-through + delay |
-| `RandomLatency` | Introduces a random delay within a specified `[min, max]` range. | Pass-through + delay |
-| `StatusCode` | Returns a specific HTTP status code (e.g., 503). | Short-circuit |
-| `RandomStatusCode` | Randomly selects a 5xx series status code (500, 502, 503, 504). | Short-circuit |
-| `Timeout` | Simulates an unresponsive service by introducing a long delay (100s). | Short-circuit |
-| `Abort` | Immediately terminates the TCP connection. | Short-circuit |
-| `HeaderInjection` | Adds `X-Chaos-Injected` and custom headers to the response. | Pass-through + intercept |
-| `Throttle` | Simulates rate limiting by returning HTTP 429 with `Retry-After`. | Short-circuit |
-| `CorruptBody` | Returns a malformed or truncated JSON response body. | Short-circuit |
-| `EmptyBody` | Returns an empty response body with `Content-Length: 0`. | Short-circuit |
-| `SlowBody` | Streams the real response body in small chunks with a per-chunk delay. | Pass-through + intercept |
-| `BandwidthThrottle` | Replays the response body at a fixed bytes-per-second rate. | Pass-through + intercept |
-| `ForcedRedirect` | Forces a redirect (301/302) to a specific URL. | Short-circuit |
-| `PartialResponse` | Writes a fraction of the response body and then aborts the connection. | Short-circuit |
-| `ContentTypeCorruption` | Overwrites the `Content-Type` header with an invalid value. | Pass-through + intercept |
+| Kind                    | Description                                                            | Behavior                 |
+| ----------------------- | ---------------------------------------------------------------------- | ------------------------ |
+| `Exception`             | Throws a configured exception (defaults to `ChaosException`).          | Short-circuit            |
+| `Latency`               | Introduces a fixed artificial delay.                                   | Pass-through + delay     |
+| `RandomLatency`         | Introduces a random delay within a specified `[min, max]` range.       | Pass-through + delay     |
+| `StatusCode`            | Returns a specific HTTP status code (e.g., 503).                       | Short-circuit            |
+| `RandomStatusCode`      | Randomly selects a 5xx series status code (500, 502, 503, 504).        | Short-circuit            |
+| `Timeout`               | Simulates an unresponsive service by introducing a long delay (100s).  | Short-circuit            |
+| `Abort`                 | Immediately terminates the TCP connection.                             | Short-circuit            |
+| `HeaderInjection`       | Adds `X-Chaos-Injected` and custom headers to the response.            | Pass-through + intercept |
+| `Throttle`              | Simulates rate limiting by returning HTTP 429 with `Retry-After`.      | Short-circuit            |
+| `CorruptBody`           | Returns a malformed or truncated JSON response body.                   | Short-circuit            |
+| `EmptyBody`             | Returns an empty response body with `Content-Length: 0`.               | Short-circuit            |
+| `SlowBody`              | Streams the real response body in small chunks with a per-chunk delay. | Pass-through + intercept |
+| `BandwidthThrottle`     | Replays the response body at a fixed bytes-per-second rate.            | Pass-through + intercept |
+| `ForcedRedirect`        | Forces a redirect (301/302) to a specific URL.                         | Short-circuit            |
+| `PartialResponse`       | Writes a fraction of the response body and then aborts the connection. | Short-circuit            |
+| `ContentTypeCorruption` | Overwrites the `Content-Type` header with an invalid value.            | Pass-through + intercept |
 
 > **SlowBody vs BandwidthThrottle**: Use `SlowBody` when you need granular control over chunk size and timing. Use `BandwidthThrottle` when you want to simulate specific network throughput (e.g., 512 KB/s).
 
@@ -183,30 +183,30 @@ Full source in [`benchmarks/`](benchmarks/).
 
 O(1) dictionary lookup — sub-nanosecond, zero allocations regardless of `ChaosKind`.
 
-| Method | Mean | Allocated |
-|---|---|---|
-| ResolveBandwidth | 0.82 ns | 0 B |
-| ResolveException | 0.82 ns | 0 B |
-| ResolveUnknown | 0.84 ns | 0 B |
-| ResolveStatusCode | 0.84 ns | 0 B |
-| ResolveLatency | 0.87 ns | 0 B |
+| Method            | Mean    | Allocated |
+| ----------------- | ------- | --------- |
+| ResolveBandwidth  | 0.82 ns | 0 B       |
+| ResolveException  | 0.82 ns | 0 B       |
+| ResolveUnknown    | 0.84 ns | 0 B       |
+| ResolveStatusCode | 0.84 ns | 0 B       |
+| ResolveLatency    | 0.87 ns | 0 B       |
 
 ### Route Matching
 
-| Method | Mean | Allocated |
-|---|---|---|
-| NoMatch | 4.24 ns | 0 B |
-| ExactMatch | 4.45 ns | 0 B |
-| HeaderMatch | 15.64 ns | 24 B |
-| WildcardMatch | 18.59 ns | 0 B |
+| Method        | Mean     | Allocated |
+| ------------- | -------- | --------- |
+| NoMatch       | 4.24 ns  | 0 B       |
+| ExactMatch    | 4.45 ns  | 0 B       |
+| HeaderMatch   | 15.64 ns | 24 B      |
+| WildcardMatch | 18.59 ns | 0 B       |
 
 ### Middleware Pipeline Overhead
 
-| Scenario | Mean | Overhead | Allocated |
-|---|---|---|---|
-| No chaos registered | 5.33 μs | baseline | 7.25 KB |
-| Chaos registered, no match | 5.48 μs | +3% | 7.28 KB |
-| Chaos registered, match + inject | 6.20 μs | +16% | 7.94 KB |
+| Scenario                         | Mean    | Overhead | Allocated |
+| -------------------------------- | ------- | -------- | --------- |
+| No chaos registered              | 5.33 μs | baseline | 7.25 KB   |
+| Chaos registered, no match       | 5.48 μs | +3%      | 7.28 KB   |
+| Chaos registered, match + inject | 6.20 μs | +16%     | 7.94 KB   |
 
 > The **+3% overhead** (≈150 ns) represents the cost of route evaluation when no rule matches — virtually invisible in production. The **+16%** reflects the actual fault injection cost, not middleware overhead.
 
@@ -298,24 +298,24 @@ dotnet run
 
 **Pre-configured endpoints:**
 
-| Route | Chaos Kind |
-|---|---|
-| `GET /api/orders/{id}` | `StatusCode` → 503 |
-| `GET /api/payments/{id}` | `Exception` |
-| `GET /api/slow` | `Latency` → 200ms |
-| `GET /api/unstable` | `RandomStatusCode` |
-| `GET /api/timeout` | `Timeout` |
-| `GET /api/header-chaos` | `HeaderInjection` + custom header `X-Chaos-Scenario` |
-| `GET /api/throttle` | `Throttle` → 429, Retry-After: 10s |
-| `GET /api/corrupt-body` | `CorruptBody` |
-| `GET /api/empty-body` | `EmptyBody` |
-| `GET /api/slow-body` | `SlowBody` → 150ms/chunk, 32B |
-| `GET /api/redirect` | `ForcedRedirect` → `/api/products` |
-| `GET /api/random-latency` | `RandomLatency` → 50–500ms |
-| `GET /api/partial` | `PartialResponse` → 32B |
-| `GET /api/bandwidth` | `BandwidthThrottle` → 128B/s |
-| `GET /api/wrong-content-type` | `ContentTypeCorruption` → text/plain |
-| `GET /api/abort` | `Abort` |
+| Route                         | Chaos Kind                                           |
+| ----------------------------- | ---------------------------------------------------- |
+| `GET /api/orders/{id}`        | `StatusCode` → 503                                   |
+| `GET /api/payments/{id}`      | `Exception`                                          |
+| `GET /api/slow`               | `Latency` → 200ms                                    |
+| `GET /api/unstable`           | `RandomStatusCode`                                   |
+| `GET /api/timeout`            | `Timeout`                                            |
+| `GET /api/header-chaos`       | `HeaderInjection` + custom header `X-Chaos-Scenario` |
+| `GET /api/throttle`           | `Throttle` → 429, Retry-After: 10s                   |
+| `GET /api/corrupt-body`       | `CorruptBody`                                        |
+| `GET /api/empty-body`         | `EmptyBody`                                          |
+| `GET /api/slow-body`          | `SlowBody` → 150ms/chunk, 32B                        |
+| `GET /api/redirect`           | `ForcedRedirect` → `/api/products`                   |
+| `GET /api/random-latency`     | `RandomLatency` → 50–500ms                           |
+| `GET /api/partial`            | `PartialResponse` → 32B                              |
+| `GET /api/bandwidth`          | `BandwidthThrottle` → 128B/s                         |
+| `GET /api/wrong-content-type` | `ContentTypeCorruption` → text/plain                 |
+| `GET /api/abort`              | `Abort`                                              |
 
 ---
 
