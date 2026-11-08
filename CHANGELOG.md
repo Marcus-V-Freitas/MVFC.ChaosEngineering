@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.7] - 2026-11-07
+
+### Added
+- **Tag Ancestry Validation**: Added a CI pre-flight check in `build-and-publish` to verify that release tags are ancestors of the `main` branch before packaging.
+
+### Changed
+- **PR Workflow Scoping**: Restricted `test-and-coverage` executions to internal pull requests from repository owner (`Marcus-V-Freitas`).
+- **Streamlined Workflow Triggers**: Removed direct push triggers on `main`, running test and coverage exclusively on pull requests and releases on tag pushes.
+
+### Removed
+- Removed `check-main-push` job from CI workflow.
+
 ## [1.3.6] - 2026-11-07
 
 ### Added
@@ -129,6 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% Test Coverage**: Fully verified library with 100% line and branch coverage.
 - **Comprehensive Documentation**: Complete XML comments and bi-lingual (EN/PT-BR) READMEs.
 
+[1.3.7]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.3...v1.3.4
