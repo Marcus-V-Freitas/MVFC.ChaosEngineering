@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 #  MVFC – .editorconfig
 #  Melhores práticas C# / .NET 2026
 #  Baseado em: Microsoft Coding Conventions, Roslyn Analyzers,
@@ -332,6 +332,12 @@ dotnet_naming_rule.local_functions_must_be_pascal.severity = warning
 # 11. DIAGNÓSTICOS ROSLYN — IDE (code style)
 # ──────────────────────────────────────────────────────────
 
+# Task.ConfigureAwait
+dotnet_diagnostic.MA0004.severity = none
+
+# Exceptions constructors
+dotnet_diagnostic.RCS1194.severity = none
+
 # Remover usings desnecessários
 dotnet_diagnostic.IDE0005.severity = warning
 
@@ -468,6 +474,10 @@ dotnet_diagnostic.CA1822.severity = none
 # Ignora o aviso S1144 (SonarAnalyzer: Remove unused private methods) para todo o projeto
 [*.cs]
 dotnet_diagnostic.S1144.severity = none
+
+# Ignora MA0048 em AppHost.cs (top-level statements geram classe Program)
+[**/AppHost.cs]
+dotnet_diagnostic.MA0048.severity = none
 
 # ──────────────────────────────────────────────────────────
 # 14. ROSLYNATOR — principais

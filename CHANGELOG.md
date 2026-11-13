@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-11-13
+
+### Added
+- **.NET 11 Support**: Added `net11.0` target framework to `MVFC.ChaosEngineering`, tests, benchmarks, and playground projects.
+- **CI .NET 11 SDK**: Updated GitHub Actions workflows (`test-and-coverage` and `build-and-publish`) to include .NET 11 (`11.0.x`).
+- **Unified Analyzer Suite**: Added `MVFC.Pack.Analyzers` (v4.0.2) via central build targets.
+- **Local Tool Manifest**: Added `dotnet-coverage` (18.12.0) and `dotnet-reportgenerator-globaltool` (5.3.11) to `.config/dotnet-tools.json`.
+- **Global SDK Configuration**: Added `global.json` SDK configuration with `latestMajor` roll-forward and prerelease support.
+
+### Changed
+- **Breaking**: Target framework upgrade across test, benchmark, and playground projects to .NET 11.
+- **Case-Insensitive Header Evaluation**: Updated `ChaosRule` header value checks to use `StringComparer.OrdinalIgnoreCase`.
+- **Cake Build Modernization**: Updated `build.cake` to execute local tools via `dotnet tool run` instead of downloading binaries into `./tools`.
+- **Code Style & Analyzers**:
+  - Configured rules in `.editorconfig` to silence `MA0004` (Task.ConfigureAwait) and `RCS1194` (Exception constructors).
+  - Configured rule suppression for `AppHost.cs` top-level statement naming (`MA0048`).
+- **Dependency Updates**:
+  - `cake.tool` updated to 5.1.0.
+  - `Aspire.Hosting.*` updated to 13.6.5.
+  - `Microsoft.NET.Test.Sdk` updated to 18.12.0.
+  - `Microsoft.Testing.Platform` updated to 2.5.3.
+  - `xunit.v3` updated to 4.0.3.
+  - `Refit` standardized to 16.4.0 across all targets.
+  - Pinned `Microsoft.AspNetCore.TestHost` versions for .NET 9 (`[9.0.14]`), .NET 10 (`[10.0.14]`), and .NET 11 (`11.0.0`).
+- **Playground Architecture**:
+  - Refactored `ChaosPlaygroundExtensions.MapChaosEndpoints` into modular methods (`MapDomainEndpoints`, `MapLatencyEndpoints`, `MapBodyEndpoints`, `MapFaultEndpoints`) complying with method length limits (MA0051).
+
 ## [1.3.7] - 2026-11-07
 
 ### Added
@@ -141,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% Test Coverage**: Fully verified library with 100% line and branch coverage.
 - **Comprehensive Documentation**: Complete XML comments and bi-lingual (EN/PT-BR) READMEs.
 
+[2.0.0]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.7...v2.0.0
 [1.3.7]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/Marcus-V-Freitas/MVFC.ChaosEngineering/compare/v1.3.4...v1.3.5

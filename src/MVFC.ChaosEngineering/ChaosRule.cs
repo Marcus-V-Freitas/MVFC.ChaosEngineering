@@ -80,7 +80,7 @@ internal sealed record ChaosRule(
             if (!context.Request.Headers.TryGetValue(HeaderName, out var values))
                 return false;
 
-            if (!string.IsNullOrWhiteSpace(HeaderValue) && !values.Contains(HeaderValue))
+            if (!string.IsNullOrWhiteSpace(HeaderValue) && !values.Contains(HeaderValue, StringComparer.OrdinalIgnoreCase))
                 return false;
         }
 
