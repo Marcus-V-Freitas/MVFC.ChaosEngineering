@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-13
+
+### Changed
+- **CI Runner Modernization**: Updated GitHub Actions runner from `ubuntu-22.04` to `ubuntu-latest` across all jobs (`test-and-coverage`, `build-and-publish`, and `create-release`).
+- **Documentation**: Updated platform badges in root and package README files (`README.md`, `README.pt-BR.md`) to include .NET 11 (`.NET 9 | 10 | 11`).
+
 ## [2.0.0] - 2026-11-13
 
 ### Added
